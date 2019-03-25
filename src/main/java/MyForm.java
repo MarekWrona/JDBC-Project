@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,13 +12,15 @@ public class MyForm extends JFrame implements ActionListener {
     private static String tytul = "Praca z bazą danych".toUpperCase();
     private Customer cust;
     private CustomerJDBCDaoImpl customerJDBCDao;
+    private JPanel panel;
     private JScrollPane scrollPane;
     private JButton buttonDeleteRecord, buttonFindRecord, buttonFiltrData, buttonUpdateRecord,
-            buttonCreateRecord, buttonShowAll, buttonTest;
+            buttonCreateRecord, buttonShowAll;
     private JButton buttonRunFindById, buttonRunFiltr, buttonRunUpdate, buttonRunCreate, buttonRunDelete;
     private JLabel lblId, lblName, lblSurname, lblAge, lblAddress, lblSalary, lblArea, lblKomunikat;
-    private JTextField txtId, txtName, txtSurname, txtAge, txtAddress, txtSalary, txtTest;
+    private JTextField txtId, txtName, txtSurname, txtAge, txtAddress, txtSalary;
     private JTextArea txtArea;
+    private int rows;
 
     public MyForm (){
 
@@ -31,15 +34,21 @@ public class MyForm extends JFrame implements ActionListener {
         setSize(1040, 360);
         setLayout(null);
 
-        txtArea = new JTextArea(10, 600);
-        txtArea.setBounds(300, 70, 600, 200);
+        panel = new JPanel();
+        panel.setBounds(250, 70, 500, 200);
+        panel.setOpaque(false);
+        add(panel);
+
+        txtArea = new JTextArea(rows,35);
+        //txtArea.setBounds(0, 0, 400, 100);
         txtArea.setOpaque(false);
         txtArea.setAutoscrolls(true);
         txtArea.setEditable(false);
         scrollPane = new JScrollPane(txtArea);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scrollPane, BorderLayout.CENTER);
-        add(txtArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane);
+        panel.add(scrollPane);
 
         buttonFindRecord = new JButton("Znajdź użytkownika");
         buttonFindRecord.setBounds(20, 20, 150, 20);
@@ -160,7 +169,9 @@ public class MyForm extends JFrame implements ActionListener {
     }
 
     private void hideAll() {
-        txtArea.setVisible(false);
+        panel.setVisible(false);
+        txtArea.setRows(2);
+        //txtArea.setVisible(false);
         txtArea.setText("");
         lblArea.setVisible(false);
         lblArea.setText("");
@@ -232,10 +243,14 @@ public class MyForm extends JFrame implements ActionListener {
             hideAll();
             super.setTitle(tytul + " - reprezntacja wszystkich danych bazy".toUpperCase());
             customerJDBCDao = new CustomerJDBCDaoImpl();
+            rows = customerJDBCDao.getallCustomers().size();
+            if (rows > 10) rows = 10;
+            txtArea.setRows(rows);
             txtArea.setText(printCustomers(customerJDBCDao.getallCustomers()));
             lblArea.setText("Lista wyników spełniających zapytanie:");
             lblArea.setVisible(true);
-            txtArea.setVisible(true);
+            panel.setVisible(true);
+            //txtArea.setVisible(true);
 
         }else if ((source == buttonUpdateRecord)) {
             hideAll();
@@ -273,7 +288,7 @@ public class MyForm extends JFrame implements ActionListener {
                     lblArea.setText("Użytkownik o nr Id " + customerId);
                     lblArea.setVisible(true);
                     txtArea.setText(customerJDBCDao.findById(customerId).toString());
-                    txtArea.setVisible(true);
+                    panel.setVisible(true);
                 } else {
                     lblKomunikat.setText("Uzytkownk o padanym nr ID nie istnieje");
                     lblKomunikat.setVisible(true);
@@ -358,7 +373,12 @@ public class MyForm extends JFrame implements ActionListener {
             txtArea.setText(customerJDBCDao.filtrSearch(zapytanie, uzytePole, name, surname, age, address, salary));
             lblArea.setText("Lista wyników spełniających zapytanie:");
             lblArea.setVisible(true);
-            txtArea.setVisible(true);
+            if (customerJDBCDao.filtrSearch(zapytanie, uzytePole, name, surname, age, address, salary).length() <= 10)
+                rows = customerJDBCDao.filtrSearch(zapytanie, uzytePole, name, surname, age, address, salary).length();
+            else rows = 10;
+            txtArea.setRows(rows);
+
+            panel.setVisible(true);
 
         }else if (source == buttonRunUpdate) {
             //System.out.println("Aktualizacja rekordu w bazie");
@@ -434,7 +454,7 @@ public class MyForm extends JFrame implements ActionListener {
                 lblArea.setText("Zaktualizowany użytkownik: ");
                 lblArea.setVisible(true);
                 txtArea.setText(customerJDBCDao.update(cust));
-                txtArea.setVisible(true);
+                panel.setVisible(true);
             }
 
         }else if (source == buttonRunCreate) {
@@ -468,7 +488,7 @@ public class MyForm extends JFrame implements ActionListener {
                 lblArea.setText("Utworzony użytkownik: ");
                 lblArea.setVisible(true);
                 txtArea.setText(customerJDBCDao.create(cust));
-                txtArea.setVisible(true);
+                panel.setVisible(true);
             }
 
         }else if (source == buttonRunDelete) {
@@ -483,7 +503,7 @@ public class MyForm extends JFrame implements ActionListener {
                     lblArea.setText("Usunięty użytkownik z bazy: ");
                     lblArea.setVisible(true);
                     txtArea.setText(customerJDBCDao.delete(customerId));
-                    txtArea.setVisible(true);
+                    panel.setVisible(true);
                 } else {
                     lblKomunikat.setVisible(true);
                 }
@@ -495,7 +515,6 @@ public class MyForm extends JFrame implements ActionListener {
         StringBuffer sb = new StringBuffer();
         for (Customer cust : customers) {
             sb.append(cust.toString());
-            //sb.append("\n");
         }
         return  sb.toString().substring(0,sb.toString().length()-2);
     }
