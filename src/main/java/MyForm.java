@@ -20,7 +20,9 @@ public class MyForm extends JFrame implements ActionListener {
     private JLabel lblId, lblName, lblSurname, lblAge, lblAddress, lblSalary, lblArea, lblKomunikat;
     private JTextField txtId, txtName, txtSurname, txtAge, txtAddress, txtSalary;
     private JTextArea txtArea;
+    private JRadioButton radioAnd, radioOr;
     private int rows;
+    private String wybor = " AND ";
 
     public MyForm (){
 
@@ -162,6 +164,24 @@ public class MyForm extends JFrame implements ActionListener {
         txtSalary.setBounds(850, 180, 60, 20);
         add(txtSalary);
 
+        radioAnd = new JRadioButton();
+        radioAnd.setBounds(50, 100, 80, 20);
+        radioAnd.setText("AND");
+        radioAnd.setSelected(true);
+        add(radioAnd);
+        radioAnd.addActionListener(this);
+
+        radioOr = new JRadioButton();
+        radioOr.setBounds(150, 100, 80, 20);
+        radioOr.setText("OR");
+        add(radioOr);
+        radioOr.addActionListener(this);
+
+        //Group the radio buttons.
+        ButtonGroup groupRadio = new ButtonGroup();
+        groupRadio.add(radioAnd);
+        groupRadio.add(radioOr);
+
         hideAll();
 
         customerJDBCDao = new CustomerJDBCDaoImpl();
@@ -199,6 +219,8 @@ public class MyForm extends JFrame implements ActionListener {
         buttonRunFiltr.setVisible(false);
         buttonRunFindById.setVisible(false);
         buttonRunUpdate.setVisible(false);
+        radioAnd.setVisible(false);
+        radioOr.setVisible(false);
 
     }
 
@@ -235,6 +257,8 @@ public class MyForm extends JFrame implements ActionListener {
             showAll();
             lblId.setVisible(false);
             txtId.setVisible(false);
+            radioAnd.setVisible(true);
+            radioOr.setVisible(true);
             txtName.requestFocus();
             buttonRunFiltr.setVisible(true);
             super.setTitle(tytul + " - wyszukiwanie złożonych danych".toUpperCase());
@@ -360,7 +384,7 @@ public class MyForm extends JFrame implements ActionListener {
                     if (i != 4) {
                         for (int j=i+1; j<=4; j++) {
                             if (uzytePole[j]) {
-                                zapytanie.append(" AND ");
+                                zapytanie.append(wybor);
                                 break;
                             }
                         }
@@ -368,8 +392,10 @@ public class MyForm extends JFrame implements ActionListener {
                 }
             }
 
-            System.out.println(zapytanie);
+            //System.out.println(zapytanie);
             hideAll();
+            //if ((CustomerJDBCDaoImpl) liczbawynikow == 0) chciałem sprawdzić czy liczba wyników wyszukiwania jest rowna 0
+            //bo wtedy podam inny komunikat
             txtArea.setText(customerJDBCDao.filtrSearch(zapytanie, uzytePole, name, surname, age, address, salary));
             lblArea.setText("Lista wyników spełniających zapytanie:");
             lblArea.setVisible(true);
@@ -508,8 +534,15 @@ public class MyForm extends JFrame implements ActionListener {
                     lblKomunikat.setVisible(true);
                 }
             }
+        }else if (source == radioAnd) {
+            wybor = " AND ";
+
+        }else if (source == radioOr) {
+            wybor = " OR ";
+
         }
     }
+
 
     private String printCustomers(List<Customer> customers) {
         StringBuffer sb = new StringBuffer();

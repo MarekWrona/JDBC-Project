@@ -10,6 +10,7 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
     private Connection conn;
     private PreparedStatement statement;
     private String wynikString = "";
+    private static int liczbaWynikow = 0;
 
     public CustomerJDBCDaoImpl() {
         try {
@@ -81,7 +82,6 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
             }
 
             ResultSet rs = statement.executeQuery();
-            int liczbaWynikow = 0;
             StringBuffer sb = new StringBuffer();
 
             while (rs.next()){
