@@ -417,15 +417,18 @@ public class MyForm extends JFrame implements ActionListener {
             long customerId = 0;
 
             //spr czy jakiekolwiek pole oprócz Id zostało wypełnione
-            if (txtName.getText().isEmpty()&&txtSurname.getText().isEmpty()
-                    &&txtAge.getText().isEmpty()&&txtAddress.getText().isEmpty()&&txtSalary.getText().isEmpty()) {
-                lblKomunikat.setText("Aby zaktualizować użytkownika należy podać przynajmniej jedną wartość do zmiany");
-                lblKomunikat.setVisible(true);
-            } else {
-                if (!txtId.getText().isEmpty()) {       //spr czy pole Id nie jest puste
-                    if (checkIsInt(txtId.getText())) {     //spr czy pole id jest liczbą
-                        customerId = Long.parseLong(txtId.getText());
-                        cust = customerJDBCDao.findById(customerId);
+
+            if (!txtId.getText().isEmpty()) {       //spr czy pole Id nie jest puste
+                if (checkIsInt(txtId.getText())) {     //spr czy pole id jest liczbą
+                    customerId = Long.parseLong(txtId.getText());
+                    cust = customerJDBCDao.findById(customerId);
+
+                    if (txtName.getText().isEmpty()&&txtSurname.getText().isEmpty()
+                            &&txtAge.getText().isEmpty()&&txtAddress.getText().isEmpty()&&txtSalary.getText().isEmpty()) {
+                        lblKomunikat.setText("Aby zaktualizować użytkownika należy podać przynajmniej jedną wartość do zmiany");
+                        lblKomunikat.setVisible(true);
+
+                    } else {
 
                         if (!txtName.getText().isEmpty()) {
                             name = txtName.getText();
@@ -466,21 +469,21 @@ public class MyForm extends JFrame implements ActionListener {
                             }
                         }
 
-                    } else {
-                        lblKomunikat.setText("Pole nr ID nie zawiera liczby");
-                        txtId.setText("");
-                        lblKomunikat.setVisible(true);
+                        hideAll();
+                        lblArea.setText("Zaktualizowany użytkownik: ");
+                        lblArea.setVisible(true);
+                        txtArea.setText(customerJDBCDao.update(cust));
+                        panel.setVisible(true);
+
                     }
                 } else {
-                    lblKomunikat.setText("Pole numeru ID wyszukiwanego rekordu jest puste!");
+                    lblKomunikat.setText("Pole numeru ID wyszukiwanego rekordu musi być liczbą!");
+                    txtId.setText("");
                     lblKomunikat.setVisible(true);
                 }
-
-                hideAll();
-                lblArea.setText("Zaktualizowany użytkownik: ");
-                lblArea.setVisible(true);
-                txtArea.setText(customerJDBCDao.update(cust));
-                panel.setVisible(true);
+            } else {
+                lblKomunikat.setText("Pole numeru ID wyszukiwanego rekordu nie może być puste!");
+                lblKomunikat.setVisible(true);
             }
 
         }else if (source == buttonRunCreate) {
