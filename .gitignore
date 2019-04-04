@@ -5,6 +5,7 @@ out/
 
 # Java
 *.class
+target/
 
 # Log file
 *.log

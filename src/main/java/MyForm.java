@@ -1,3 +1,6 @@
+import com.example.jdbc.mvp.model.Customer;
+import com.example.jdbc.mvp.model.CustomerJDBCDaoImpl;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -231,7 +234,6 @@ public class MyForm extends JFrame implements ActionListener {
         }else if(source == buttonShowAll) {
             hideAll();
             super.setTitle(tytul + " - reprezntacja wszystkich danych bazy".toUpperCase());
-            customerJDBCDao = new CustomerJDBCDaoImpl();
             txtArea.setText(printCustomers(customerJDBCDao.getallCustomers()));
             lblArea.setText("Lista wyników spełniających zapytanie:");
             lblArea.setVisible(true);
@@ -463,7 +465,7 @@ public class MyForm extends JFrame implements ActionListener {
             //hideAll();
             if (!txtName.getText().isEmpty() && !txtSurname.getText().isEmpty() && !txtAge.getText().isEmpty()
                         && !txtAddress.getText().isEmpty() && !txtSalary.getText().isEmpty()) {
-                cust = new Customer(1, name, surname, age, address, salary);
+                cust = new Customer(name, surname, age, address, salary);
                 hideAll();
                 lblArea.setText("Utworzony użytkownik: ");
                 lblArea.setVisible(true);
@@ -497,7 +499,7 @@ public class MyForm extends JFrame implements ActionListener {
             sb.append(cust.toString());
             //sb.append("\n");
         }
-        return  sb.toString().substring(0,sb.toString().length()-2);
+        return  sb.toString();
     }
 
 

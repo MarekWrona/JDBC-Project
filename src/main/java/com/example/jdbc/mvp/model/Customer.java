@@ -1,3 +1,5 @@
+package com.example.jdbc.mvp.model;
+
 import java.math.BigDecimal;
 
 public class Customer {
@@ -8,13 +10,17 @@ public class Customer {
     private String address;
     private BigDecimal salary;
 
-    public Customer(long id, String name, String surname, int age, String adress, BigDecimal salary) {
+    public Customer(long id, String name, String surname, int age, String address, BigDecimal salary) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.age = age;
-        this.address = adress;
+        this.address = address;
         this.salary = salary;
+    }
+
+    public Customer(String name, String surname, int age, String address, BigDecimal salary) {
+        this(0, name, surname, age, address, salary);
     }
 
     public String getName() {
@@ -41,10 +47,6 @@ public class Customer {
         return surname;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -67,10 +69,8 @@ public class Customer {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
-        sb.append(id).append(". ").append(name).append(" ").append(surname.toUpperCase());
-        sb.append(", ").append(age).append(", ").append(address);
-        sb.append(", ").append(salary).append("\n");
-        return sb.toString();
+        return id + ". " + name + " " + surname.toUpperCase() +
+                ", " + age + ", " + address +
+                ", " + salary + "\n";
     }
 }

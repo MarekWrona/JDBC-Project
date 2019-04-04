@@ -1,10 +1,12 @@
-import javax.swing.*;
+package com.example.jdbc.mvp.model;
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerJDBCDaoImpl implements CustmerDao{
+@SuppressWarnings("SqlDialectInspection")
+public class CustomerJDBCDaoImpl implements CustomerDao {
 
     private String sql;
     private Connection conn;
@@ -14,7 +16,9 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
     public CustomerJDBCDaoImpl() {
         try {
             Class.forName("org.h2.Driver");
-            conn = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test","sa","");
+            conn = DriverManager.getConnection("jdbc:h2:mem:test", "sa", ""); // in-memory database, change as needed
+
+            createTable();
         } catch (SQLException ex) {
             ex.printStackTrace();
             System.out.println("Nie połączyłeś się z bazą");
@@ -23,8 +27,24 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
         }
     }
 
+    private void createTable() throws SQLException {
+        System.out.println("CREATING TABLE!!!");
+        conn.prepareStatement("create table if not exists customer\n" +
+                "(\n" +
+                "\tcustomer_id long auto_increment,\n" +
+                "\tname varchar(256),\n" +
+                "\tsurname varchar(256),\n" +
+                "\tage int,\n" +
+                "\taddress varchar(256),\n" +
+                "\tsalary decimal,\n" +
+                "\tconstraint customer_pk\n" +
+                "\t\tprimary key (customer_id)\n" +
+                ");\n" +
+                "\n").execute();
+    }
 
-    public void close(){
+
+    public void close() {
         try {
             conn.close();
         } catch (SQLException ex) {
@@ -43,8 +63,8 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
             statement.setLong(1, customerId);
             ResultSet rs = statement.executeQuery();
 
-            while (rs.next()){
-               cust = fillCustomer(rs);
+            while (rs.next()) {
+                cust = fillCustomer(rs);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -53,9 +73,8 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
     }
 
 
-
     public String filtrSearch(StringBuffer zapytanie, boolean[] uzytePole, String name, String surname,
-                                int age, String address, BigDecimal salary) {
+                              int age, String address, BigDecimal salary) {
 
         int numerZapytania = 0;
         String wynikSerch = "";
@@ -65,7 +84,7 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
             statement = conn.prepareStatement(sql);
 
             //ustalenie numerów kolumn do ustawienia zapytania
-            for (int i=0; i<=4; i++) {
+            for (int i = 0; i <= 4; i++) {
                 if (uzytePole[i]) {
                     numerZapytania++;
                     if (i == 0) {
@@ -74,18 +93,18 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
                         statement.setString(numerZapytania, surname);
                     } else if (i == 2) {
                         statement.setInt(numerZapytania, age);
-                    }else if (i == 3){
+                    } else if (i == 3) {
                         statement.setString(numerZapytania, address);
-                    }else statement.setBigDecimal(numerZapytania, salary);
+                    } else statement.setBigDecimal(numerZapytania, salary);
                 }
             }
 
             ResultSet rs = statement.executeQuery();
             int liczbaWynikow = 0;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
-            while (rs.next()){
-                liczbaWynikow ++;
+            while (rs.next()) {
+                liczbaWynikow++;
                 sb.append(liczbaWynikow).append(". ").append(rs.getString(2));
                 sb.append(" ").append(rs.getString(3).toUpperCase()).append(", ");
                 sb.append(rs.getInt(4)).append(", ");
@@ -150,6 +169,8 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        System.out.println("Created customer: " + wynikString);
         return wynikString;
     }
 
@@ -173,7 +194,7 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
 
     public List<Customer> getallCustomers() {
         List<Customer> retList = new ArrayList<Customer>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int liczbaRekordow = 0;
 
         try {
@@ -196,7 +217,7 @@ public class CustomerJDBCDaoImpl implements CustmerDao{
     }
 
 
-    private Customer fillCustomer (ResultSet rs) throws SQLException {
+    private Customer fillCustomer(ResultSet rs) throws SQLException {
         Customer c = null;
         c = new Customer(rs.getLong("CUSTOMER_ID"),
                 rs.getString("NAME"),
